@@ -1,0 +1,34 @@
+Compilar glibc es delicado, si la cagas puedes romper el sistema. *NUNCA* lo hagas en tu sistema principal, hazlo en un directorio separado.
+
+Aquí los pasos seguros en Debian:
+
+*1. Instala dependencias:*
+sudo apt update
+sudo apt install build-essential gawk bison python3 texinfo
+*2. Descarga y descomprime:*
+wget https://ftp.gnu.org/gnu/glibc/glibc-2.39.tar.gz
+tar xvf glibc-2.39.tar.gz
+cd glibc-2.39
+mkdir build && cd build
+*3. Configura en carpeta aparte (OBLIGATORIO):*
+../configure --prefix=/opt/glibc-2.39 --disable-werror
+# --prefix importante: no sobreescribirá tu glibc del sistema
+*4. Compila:*
+make -j$(nproc)
+# tarda 10-20 min
+*5. Prueba antes de instalar:*
+make check
+*6. Instala en /opt:*
+sudo make install
+*7. Probar tu programa con la nueva glibc sin romper nada:*
+/opt/glibc-2.39/lib/ld-linux-x86-64.so.2 --library-path /opt/glibc-2.39/lib ./tu_programa
+---
+
+*ERRORES COMUNES:*
+
+- `cannot compute suffix of object files`: te falta `build-essential`
+- Si haces `make install` sin `--prefix`, *rompes Linux* y tendrás que reinstalar.
+
+¿Por qué la quieres compilar? ¿Para versión más nueva, para Android (APK que decías), o para hacer un toolchain cruzado?
+
+Dime tu distro y objetivo y te doy el comando exacto.
